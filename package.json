@@ -1,0 +1,16 @@
+{
+  "name": "aniversariantes-do-mes",
+  "version": "1.0.0",
+  "description": "Envia mensagens de aniversario dos colaboradores via WhatsApp",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "mensal": "node src/index.js mensal",
+    "lembretes": "node src/index.js lembretes"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}

@@ -1,0 +1,10 @@
+[Unit]
+Description=Dispara o Aniversariantes do Mes todo dia as 09:00 (America/Fortaleza)
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 America/Fortaleza
+Persistent=true
+Unit=aniversariantes.service
+
+[Install]
+WantedBy=timers.target

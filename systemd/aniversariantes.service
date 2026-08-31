@@ -1,0 +1,9 @@
+[Unit]
+Description=Aniversariantes do Mes - verificacao diaria e envio via WhatsApp
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Formação Claude Code 2026/Aniversariantes do Mes
+Environment=TZ=America/Fortaleza
+ExecStart=%h/.nvm/versions/node/v24.18.0/bin/node src/index.js diario
+TimeoutStartSec=180
