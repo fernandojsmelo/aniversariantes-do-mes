@@ -6,10 +6,10 @@ function formatarData(colaborador) {
   return `${dia}/${mes}/${colaborador.ano}`;
 }
 
-// Mensagem 1: lista completa por mes, com os aniversariantes do mes corrente em negrito.
+// Mensagem 1: lista completa por mes, com os aniversariantes do mes corrente destacados.
 function montarMensagemCompleta(colaboradores, data) {
   const mesCorrente = data.getMonth() + 1;
-  const linhas = ['*Aniversário Colaboradores SmartData*', ''];
+  const linhas = ['Aniversário Colaboradores SmartData', ''];
 
   for (const mesNome of MESES) {
     const numeroMes = MESES.indexOf(mesNome) + 1;
@@ -23,7 +23,7 @@ function montarMensagemCompleta(colaboradores, data) {
     } else {
       for (const c of doMes) {
         const texto = `${c.nome} ${formatarData(c)}`;
-        linhas.push(numeroMes === mesCorrente ? `*${texto}*` : texto);
+        linhas.push(numeroMes === mesCorrente ? `>> ${texto}` : texto);
       }
     }
     linhas.push('');
@@ -39,9 +39,9 @@ function montarMensagemDoMes(aniversariantesDoMes, data) {
   }
 
   const mesNome = MESES[data.getMonth()];
-  const linhas = [`*Aniversariantes de ${mesNome}*`, ''];
+  const linhas = [`Aniversariantes de ${mesNome}`, ''];
   for (const c of aniversariantesDoMes) {
-    linhas.push(`🎉 *${c.nome}* - ${formatarData(c)}`);
+    linhas.push(`${c.nome} - ${formatarData(c)}`);
   }
   return linhas.join('\n');
 }

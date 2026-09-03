@@ -1,5 +1,5 @@
 [Unit]
-Description=Aniversariantes do Mes - verificacao diaria e envio via WhatsApp
+Description=Aniversariantes do Mes - verificacao diaria e envio via SMS
 
 [Service]
 Type=oneshot

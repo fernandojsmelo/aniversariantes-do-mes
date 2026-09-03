@@ -1,15 +1,14 @@
+require('./loadEnv');
 const { lerColaboradores } = require('./parseOdt');
 const { aniversariantesDoMes } = require('./birthdays');
 const { montarMensagemCompleta, montarMensagemDoMes } = require('./messages');
-const whatsapp = require('./whatsappClient');
+const sms = require('./smsClient');
 const db = require('./db');
 const { NUMERO_DESTINO, NUMERO_OPERADOR, CAMINHO_ODT, hoje } = require('./config');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
-let clientAtivo = null;
-
-async function rodarMensal(client) {
+async function rodarMensal() {
   const data = hoje();
   const ano = data.getFullYear();
   const mes = data.getMonth() + 1;
@@ -37,7 +36,7 @@ async function rodarMensal(client) {
     return;
   }
 
-  await whatsapp.enviarParaNumero(client, NUMERO_DESTINO, [mensagem1, mensagem2]);
+  await sms.enviarParaNumero(NUMERO_DESTINO, [mensagem1, mensagem2]);
 
   db.registrarEnvioMensal(banco, ano, mes);
   db.gerarLembretes(banco, doMes, ano);
@@ -45,7 +44,7 @@ async function rodarMensal(client) {
   console.log('\nMensagens enviadas e lembretes individuais gerados com sucesso.');
 }
 
-async function rodarLembretes(client) {
+async function rodarLembretes() {
   const data = hoje();
   const dia = data.getDate();
   const mes = data.getMonth() + 1;
@@ -60,11 +59,11 @@ async function rodarLembretes(client) {
   }
 
   for (const lembrete of pendentes) {
-    const texto = `Lembrete. 🎂 Hoje é aniversário de ${lembrete.nome}!`;
+    const texto = `Lembrete. Hoje é aniversário de ${lembrete.nome}!`;
     console.log(`Lembrete: ${texto} -> ${NUMERO_DESTINO}`);
 
     if (!DRY_RUN) {
-      await whatsapp.enviarParaNumero(client, NUMERO_DESTINO, [texto]);
+      await sms.enviarParaNumero(NUMERO_DESTINO, [texto]);
       db.marcarLembreteEnviado(banco, lembrete.id);
     }
   }
@@ -75,41 +74,13 @@ async function rodarLembretes(client) {
 }
 
 // Comando usado em producao (um unico timer do systemd, uma vez por dia, 09:00):
-// roda o envio mensal quando for dia 1, e sempre verifica os lembretes do dia,
-// tudo numa unica conexao com o WhatsApp (evita duas instancias do Chrome disputando
-// o mesmo perfil ao mesmo tempo).
+// roda o envio mensal quando for dia 1, e sempre verifica os lembretes do dia.
 async function rodarDiario() {
   const data = hoje();
-  const client = DRY_RUN ? null : await conectarEGuardar();
-
-  try {
-    if (data.getDate() === 1) {
-      await rodarMensal(client);
-    }
-    await rodarLembretes(client);
-  } finally {
-    if (client) {
-      await whatsapp.desconectar(client);
-      clientAtivo = null;
-    }
+  if (data.getDate() === 1) {
+    await rodarMensal();
   }
-}
-
-async function conectarEGuardar() {
-  clientAtivo = await whatsapp.conectar();
-  return clientAtivo;
-}
-
-async function rodarComandoUnico(executar) {
-  const client = DRY_RUN ? null : await conectarEGuardar();
-  try {
-    await executar(client);
-  } finally {
-    if (client) {
-      await whatsapp.desconectar(client);
-      clientAtivo = null;
-    }
-  }
+  await rodarLembretes();
 }
 
 async function alertarFalha(erro) {
@@ -117,40 +88,23 @@ async function alertarFalha(erro) {
   if (DRY_RUN) return;
 
   try {
-    const client = clientAtivo || (await whatsapp.conectar());
-    await whatsapp.enviarParaNumero(client, NUMERO_OPERADOR, [
-      `⚠️ Falha na execução do sistema de Aniversariantes do Mês:\n${erro.message}`,
+    await sms.enviarParaNumero(NUMERO_OPERADOR, [
+      `Falha na execução do sistema de Aniversariantes do Mês: ${erro.message}`,
     ]);
-    if (!clientAtivo) {
-      await whatsapp.desconectar(client);
-    }
   } catch (erroAlerta) {
     console.error('Não foi possível enviar o alerta de falha:', erroAlerta.message);
   }
 }
 
-function registrarEncerramentoGracioso() {
-  for (const sinal of ['SIGTERM', 'SIGINT']) {
-    process.on(sinal, async () => {
-      console.log(`\nRecebido ${sinal}, encerrando sessão do WhatsApp...`);
-      if (clientAtivo) {
-        await whatsapp.destruirComTimeout(clientAtivo);
-      }
-      process.exit(0);
-    });
-  }
-}
-
 async function main() {
-  registrarEncerramentoGracioso();
   const comando = process.argv[2];
 
   if (comando === 'diario') {
     await rodarDiario();
   } else if (comando === 'mensal') {
-    await rodarComandoUnico(rodarMensal);
+    await rodarMensal();
   } else if (comando === 'lembretes') {
-    await rodarComandoUnico(rodarLembretes);
+    await rodarLembretes();
   } else {
     console.log('Uso: node src/index.js <diario|mensal|lembretes> [--dry-run]');
     process.exitCode = 1;

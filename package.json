@@ -1,7 +1,7 @@
 {
   "name": "aniversariantes-do-mes",
   "version": "1.0.0",
-  "description": "Envia mensagens de aniversario dos colaboradores via WhatsApp",
+  "description": "Envia mensagens de aniversario dos colaboradores via SMS",
   "type": "commonjs",
   "scripts": {
     "start": "node src/index.js",
@@ -9,8 +9,6 @@
     "lembretes": "node src/index.js lembretes"
   },
   "dependencies": {
-    "jszip": "^3.10.1",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.26.0"
+    "jszip": "^3.10.1"
   }
 }
