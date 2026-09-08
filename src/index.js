@@ -7,6 +7,9 @@ const db = require('./db');
 const { NUMERO_DESTINO, NUMERO_OPERADOR, CAMINHO_ODT, hoje } = require('./config');
 
 const DRY_RUN = process.argv.includes('--dry-run');
+// Ignora a checagem de "já enviado este mês" e reenvia mesmo assim.
+// Uso pontual (ex.: reenviar apos corrigir o numero de destino errado).
+const FORCAR = process.argv.includes('--forcar');
 
 async function rodarMensal() {
   const data = hoje();
@@ -14,7 +17,7 @@ async function rodarMensal() {
   const mes = data.getMonth() + 1;
   const banco = db.abrirBanco();
 
-  if (db.jaEnviouMensal(banco, ano, mes)) {
+  if (!FORCAR && db.jaEnviouMensal(banco, ano, mes)) {
     console.log(`Envio mensal de ${mes}/${ano} já foi feito. Nada a fazer.`);
     return;
   }
@@ -106,7 +109,7 @@ async function main() {
   } else if (comando === 'lembretes') {
     await rodarLembretes();
   } else {
-    console.log('Uso: node src/index.js <diario|mensal|lembretes> [--dry-run]');
+    console.log('Uso: node src/index.js <diario|mensal|lembretes> [--dry-run] [--forcar]');
     process.exitCode = 1;
   }
 }

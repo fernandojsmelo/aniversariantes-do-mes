@@ -1,7 +1,9 @@
-// Numero de destino das mensagens (producao): +55 86 9986-0339, ver CLAUDE.md e App.md.
+// Numero de destino das mensagens (producao): +55 86 99986-0339, ver CLAUDE.md e App.md.
+// Corrigido em 2026-09-08: o numero anterior (8699860339, 10 digitos) era invalido
+// para SMS (faltava o 9º digito do celular); o gateway rejeitava com "invalid phone number".
 // Testes de envio via SMS (mensal e lembrete individual) validados com sucesso
 // em 2026-09-03, usando o numero operador (86999973402) como destino temporario.
-const NUMERO_DESTINO = process.env.NUMERO_DESTINO || '8699860339';
+const NUMERO_DESTINO = process.env.NUMERO_DESTINO || '86999860339';
 
 // Numero operador: chip instalado no celular que roda o app "SMS Gateway for
 // Android" e efetivamente dispara os SMS (ver src/smsClient.js).
