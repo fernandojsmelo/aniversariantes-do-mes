@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "Envia mensagens de aniversario dos colaboradores via SMS",
   "type": "commonjs",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "start": "node src/index.js",
     "mensal": "node src/index.js mensal",
-    "lembretes": "node src/index.js lembretes"
+    "lembretes": "node src/index.js lembretes",
+    "test": "node --test"
   },
   "dependencies": {
     "jszip": "^3.10.1"

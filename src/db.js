@@ -3,8 +3,8 @@ const { DatabaseSync } = require('node:sqlite');
 
 const CAMINHO_DB = path.join(__dirname, '..', 'data', 'aniversariantes.db');
 
-function abrirBanco() {
-  const db = new DatabaseSync(CAMINHO_DB);
+function abrirBanco(caminho = CAMINHO_DB) {
+  const db = new DatabaseSync(caminho);
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS envios_mensais (
