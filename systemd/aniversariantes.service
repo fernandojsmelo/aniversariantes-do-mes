@@ -3,7 +3,7 @@ Description=Aniversariantes do Mes - verificacao diaria e envio via SMS
 
 [Service]
 Type=oneshot
-WorkingDirectory=%h/Formação Claude Code 2026/Aniversariantes do Mes
+WorkingDirectory=%h/Projetos Claude/aniversariantes-do-mes
 Environment=TZ=America/Fortaleza
 ExecStart=%h/.nvm/versions/node/v24.18.0/bin/node src/index.js diario
 TimeoutStartSec=180
